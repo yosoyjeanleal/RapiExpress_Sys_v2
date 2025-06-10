@@ -1,0 +1,33 @@
+{
+    "name": "personal/rapiexpress",
+    "description": "Sistema de Gestión de Paquetes",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Grupo de Proyecto"
+        }
+    ],
+    "require": {
+        "twbs/bootstrap": "^5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "RapiExpress\\": "src/",
+            "RapiExpress\\Config\\": "config/"
+            
+        },
+          "files": [
+        "src/controllers/auth.php",
+        "src/controllers/dashboard.php",
+        "src/controllers/tienda.php",
+        "src/controllers/usuario.php",
+        "src/controllers/paquete.php",
+        "src/controllers/cliente.php",
+        "src/controllers/courier.php"
+        
+    ]
+        
+    }
+    
+}
