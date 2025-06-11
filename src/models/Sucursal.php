@@ -17,10 +17,11 @@ class Sucursal extends Conexion implements ISucursalModel
                 return 'codigo_existente';
             }
 
-            $stmt = $this->db->prepare("INSERT INTO sucursales (codigo, nombre_sucursal) VALUES (?, ?)");
-            $resultado = $stmt->execute([
+                $stmt = $this->db->prepare("INSERT INTO sucursales (codigo, nombre_sucursal, direccion, telefono) VALUES (?, ?, ?, ?)");            $resultado = $stmt->execute([
                 $data['codigo'],
-                $data['nombre_sucursal']
+                $data['nombre_sucursal'],
+                $data['direccion'],
+                $data['telefono']
             ]);
 
             return $resultado ? 'registro_exitoso' : 'error_registro';
@@ -53,11 +54,13 @@ class Sucursal extends Conexion implements ISucursalModel
                 return false;
             }
 
-            $stmt = $this->db->prepare("UPDATE sucursales SET codigo = ?, nombre_sucursal = ? WHERE id_sucursal = ?");
-            return $stmt->execute([
-                $data['codigo'],
-                $data['nombre_sucursal'],
-                $data['id_sucursal']
+           $stmt = $this->db->prepare("UPDATE sucursales SET codigo = ?, nombre_sucursal = ?, direccion = ?, telefono = ? WHERE id_sucursal = ?");
+return $stmt->execute([
+    $data['codigo'],
+    $data['nombre_sucursal'],
+    $data['direccion'],
+    $data['telefono'],
+    $data['id_sucursal'] 
             ]);
         } catch (PDOException $e) {
             $this->lastError = $e->getMessage();

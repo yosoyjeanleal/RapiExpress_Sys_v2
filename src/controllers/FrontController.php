@@ -8,10 +8,10 @@ class FrontController
         'dashboard'=> ['methods' => ['index'], 'default' => 'index'],
         'cliente'  => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerCliente'], 'default' => 'index'],
         'tienda'   => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerTienda'], 'default' => 'index'],
-        'courier'  => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerTienda'], 'default' => 'index'],
-        'sucursal'  => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerTienda'], 'default' => 'index'],
-        'paquete'  => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerTienda'], 'default' => 'index'],
-        'usuario'  => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerUsuario'], 'default' => 'index']
+        'courier'  => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerCourier'], 'default' => 'index'],
+        'paquete'  => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerPaquete'], 'default' => 'index'],
+        'usuario'  => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerUsuario'], 'default' => 'index'],
+        'sucursal' => ['methods' => ['index', 'registrar', 'editar', 'eliminar', 'obtenerSucursal'], 'default' => 'index']
     ];
 
     public function handle(string $controller, string $action): void
