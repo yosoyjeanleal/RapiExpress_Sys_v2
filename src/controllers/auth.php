@@ -6,10 +6,45 @@ use RapiExpress\Config\Conexion;
 
 session_start();
 
+// --- Funciones CSRF ---
+function generate_csrf_token() {
+    // session_start() ya está al inicio del archivo
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function verify_csrf_token($token_from_form) {
+    // session_start() ya está al inicio del archivo
+    if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token_from_form)) {
+        // Token válido, eliminarlo para prevenir reutilización
+        unset($_SESSION['csrf_token']);
+        return true;
+    }
+    // Si el token no es válido, también es buena idea eliminarlo si existe,
+    // aunque en este caso, si no coincide, es probable que sea un intento malicioso
+    // o una sesión expirada.
+    if (isset($_SESSION['csrf_token'])){
+        unset($_SESSION['csrf_token']);
+    }
+    return false;
+}
+// --- Fin Funciones CSRF ---
+
 function auth_login() {
     $error = '';
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Verificar token CSRF primero
+        if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
+            $error = t('error_validation_csrf');
+            // Generar un nuevo token para el siguiente intento del formulario
+            $csrf_token = generate_csrf_token();
+            include __DIR__ . '/../views/auth/login.php';
+            return; // Usar return en lugar de exit() para consistencia si esto es parte de un framework más grande.
+        }
+
         $username = trim($_POST['username']);
         $password = trim($_POST['password']);
 
@@ -23,13 +58,15 @@ function auth_login() {
                 header('Location: index.php?c=dashboard&a=index');
                 exit();
             } else {
-                $error = "Credenciales inválidas.";
+                $error = t('error_invalid_credentials');
             }
         } else {
-            $error = "Por favor, completa todos los campos.";
+            $error = t('error_please_complete_all_fields');
         }
     }
 
+    // Generar token CSRF para mostrar en el formulario
+    $csrf_token = generate_csrf_token();
     include __DIR__ . '/../views/auth/login.php';
 }
 
@@ -37,6 +74,26 @@ function auth_register() {
     $error = '';
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // 1. Verificar token CSRF primero
+        if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
+            $error = t('error_validation_csrf');
+            $csrf_token = generate_csrf_token(); // Regenerar token para el siguiente intento
+            include __DIR__ . '/../views/auth/register.php';
+            return;
+        }
+
+        // 2. Verificar confirmación de contraseña
+        $password = trim($_POST['password']);
+        $confirm_password = trim($_POST['confirm_password']);
+
+        if ($password !== $confirm_password) {
+            $error = t('error_passwords_no_match');
+            $csrf_token = generate_csrf_token(); // Regenerar token
+            include __DIR__ . '/../views/auth/register.php';
+            return;
+        }
+
+        // Continuar con la lógica de registro si todo está bien
         $data = [
             'documento' => trim($_POST['documento']),
             'username' => trim($_POST['username']),
@@ -46,11 +103,18 @@ function auth_register() {
             'email' => trim($_POST['email']),
             'sucursal' => trim($_POST['sucursal']),
             'cargo' => trim($_POST['cargo']),
-            'password' => password_hash(trim($_POST['password']), PASSWORD_DEFAULT)
+            'password' => password_hash($password, PASSWORD_DEFAULT) // Usar la variable $password ya saneada
         ];
 
-        if (empty($data['documento']) || empty($data['email']) || empty($data['username'])) {
-            $error = "Todos los campos obligatorios deben ser completados.";
+        // Validar campos obligatorios (se pueden añadir más validaciones aquí)
+        if (empty($data['documento']) || empty($data['username']) || empty($data['nombres']) || empty($data['apellidos']) || empty($data['email']) || empty($password)) {
+            $error = t('error_all_fields_required');
+            // No es necesario regenerar CSRF token aquí si la validación de campos falla,
+            // ya que el token original (si era válido) no se ha consumido.
+            // Pero si se quiere ser extra cauto o si el flujo pudiera consumir el token antes, se regeneraría.
+            // Por ahora, asumimos que verify_csrf_token es lo primero que se ejecuta y consume el token.
+            // Para mantener la consistencia con los otros manejos de error que muestran el formulario, generamos uno nuevo.
+            $csrf_token = generate_csrf_token();
         } else {
             $usuarioModel = new Usuario($data);
             $resultado = $usuarioModel->registrar();
@@ -62,24 +126,26 @@ function auth_register() {
                     exit();
 
                 case 'documento_existente':
-                    $error = "La cédula ya está registrada.";
+                    $error = t('error_document_exists');
                     break;
 
                 case 'email_existente':
-                    $error = "El correo electrónico ya está registrado.";
+                    $error = t('error_email_exists');
                     break;
 
                 case 'username_existente':
-                    $error = "El nombre de usuario ya está en uso.";
+                    $error = t('error_username_exists');
                     break;
 
-                default:
-                    $error = "Error al registrar. Intenta nuevamente.";
+                default: // Incluye 'error_bd' y cualquier otro caso no específico
+                    $error = t('error_registration_failed'); // O podría ser t('error_generic_db') si es más apropiado
                     break;
             }
         }
     }
 
+    // Generar token CSRF para mostrar en el formulario (GET request o si POST falla antes de redirect)
+    $csrf_token = generate_csrf_token();
     include __DIR__ . '/../views/auth/register.php';
 }
 
@@ -88,39 +154,36 @@ function auth_recoverPassword() {
     $success = '';
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Verificar token CSRF primero
+        if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
+            $error = t('error_validation_csrf');
+            // Generar un nuevo token para el siguiente intento del formulario
+            $csrf_token = generate_csrf_token();
+            include __DIR__ . '/../views/auth/recoverpassword.php';
+            return;
+        }
+
         $username = trim($_POST['username'] ?? '');
         $newPassword = trim($_POST['password'] ?? '');
 
         if (!empty($username) && !empty($newPassword)) {
-            try {
-                $conexionWrapper = new \RapiExpress\Config\ConexionWrapper();
-$pdo = $conexionWrapper->getDb();
+            $usuarioModel = new Usuario();
+            $updateResult = $usuarioModel->updatePasswordByUsername($username, $newPassword);
 
-                
-                $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE username = :username");
-                $stmt->execute(['username' => $username]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                if ($user) {
-                    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-                    $updateStmt = $pdo->prepare("UPDATE usuarios SET password = :password WHERE username = :username");
-                    $updateStmt->execute([
-                        'password' => $hashedPassword,
-                        'username' => $username
-                    ]);
-
-                    $success = "Contraseña actualizada correctamente. Puedes iniciar sesión con tu nueva contraseña.";
-                } else {
-                    $error = "Usuario no encontrado.";
-                }
-            } catch (PDOException $e) {
-                $error = "Error al conectar con la base de datos.";
+            if ($updateResult) {
+                $success = t('success_password_updated');
+            } else {
+                // El método updatePasswordByUsername podría mejorarse para distinguir "no encontrado" de "error DB"
+                // Por ahora, usamos una clave que sugiere verificar el usuario, o podría ser error_user_not_found si es más probable
+                $error = t('error_updating_password');
             }
         } else {
-            $error = "Por favor, completa todos los campos.";
+            $error = t('error_please_complete_all_fields');
         }
     }
 
+    // Generar token CSRF para mostrar en el formulario
+    $csrf_token = generate_csrf_token();
     include __DIR__ . '/../views/auth/recoverpassword.php';
 }
 

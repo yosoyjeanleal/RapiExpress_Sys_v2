@@ -29,7 +29,7 @@ function cliente_registrar() {
         ];
 
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['mensaje'] = 'Formato de email inválido.';
+            $_SESSION['mensaje'] = t('error_invalid_email_format');
             $_SESSION['tipo_mensaje'] = 'error';
             header('Location: index.php?c=cliente');
             exit();
@@ -38,16 +38,16 @@ function cliente_registrar() {
         $resultado = $clienteModel->registrar($data);
 
         if ($resultado === 'registro_exitoso') {
-            $_SESSION['mensaje'] = 'Cliente registrado exitosamente';
+            $_SESSION['mensaje'] = t('client_registered_successfully');
             $_SESSION['tipo_mensaje'] = 'success';
         } elseif ($resultado === 'cedula_existente') {
-            $_SESSION['mensaje'] = 'Error: La cédula ya está registrada';
+            $_SESSION['mensaje'] = t('error_id_card_exists');
             $_SESSION['tipo_mensaje'] = 'error';
         } elseif ($resultado === 'email_existente') {
-            $_SESSION['mensaje'] = 'Error: El email ya está registrado';
+            $_SESSION['mensaje'] = t('error_email_already_exists'); // or use generic 'error_email_exists'
             $_SESSION['tipo_mensaje'] = 'error';
         } else {
-            $_SESSION['mensaje'] = 'Error inesperado al registrar el cliente';
+            $_SESSION['mensaje'] = t('error_unexpected_client_registration');
             $_SESSION['tipo_mensaje'] = 'error';
         }
 
@@ -63,7 +63,9 @@ function cliente_editar() {
         $required = ['id_cliente', 'cedula', 'nombre', 'apellido', 'email', 'telefono', 'direccion', 'estado'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                $_SESSION['mensaje'] = "Error: El campo $field es requerido";
+                // It's better to translate the field name if possible, or use a generic message.
+                // For now, using the raw field name as per the plan.
+                $_SESSION['mensaje'] = sprintf(t('error_field_required_sprintf'), $field);
                 $_SESSION['tipo_mensaje'] = 'error';
                 header('Location: index.php?c=cliente');
                 exit();
@@ -82,7 +84,7 @@ function cliente_editar() {
         ];
 
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['mensaje'] = 'Formato de email inválido';
+            $_SESSION['mensaje'] = t('error_invalid_email_format');
             $_SESSION['tipo_mensaje'] = 'error';
             header('Location: index.php?c=cliente');
             exit();
@@ -91,10 +93,10 @@ function cliente_editar() {
         $resultado = $clienteModel->actualizar($data);
 
         if ($resultado === true) {
-            $_SESSION['mensaje'] = 'Cliente actualizado exitosamente';
+            $_SESSION['mensaje'] = t('client_updated_successfully');
             $_SESSION['tipo_mensaje'] = 'success';
         } else {
-            $_SESSION['mensaje'] = 'Error al actualizar el cliente';
+            $_SESSION['mensaje'] = t('error_updating_client');
             $_SESSION['tipo_mensaje'] = 'error';
         }
 
@@ -112,10 +114,10 @@ function cliente_eliminar() {
         $resultado = $clienteModel->eliminar($id);
 
         if ($resultado) {
-            $_SESSION['mensaje'] = 'Cliente eliminado exitosamente';
+            $_SESSION['mensaje'] = t('client_deleted_successfully');
             $_SESSION['tipo_mensaje'] = 'success';
         } else {
-            $_SESSION['mensaje'] = 'Error al eliminar el cliente';
+            $_SESSION['mensaje'] = t('error_deleting_client');
             $_SESSION['tipo_mensaje'] = 'error';
         }
 

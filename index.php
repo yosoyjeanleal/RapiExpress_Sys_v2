@@ -1,5 +1,9 @@
 <?php
 
+// Initialize Internationalization
+require_once __DIR__ . '/config/i18n.php';
+initializeLocalization(); // Detects lang from URL or session
+
 require_once __DIR__ . '/vendor/autoload.php';
 
 

@@ -30,15 +30,15 @@ function sucursal_registrar() {
 
         switch ($resultado) {
             case 'registro_exitoso':
-                $_SESSION['mensaje'] = 'Sucursal registrada exitosamente';
+                $_SESSION['mensaje'] = t('branch_registered_successfully');
                 $_SESSION['tipo_mensaje'] = 'success';
                 break;
             case 'codigo_existente':
-                $_SESSION['mensaje'] = 'El código ya está registrado';
+                $_SESSION['mensaje'] = t('error_code_exists');
                 $_SESSION['tipo_mensaje'] = 'error';
                 break;
             default:
-                $_SESSION['mensaje'] = 'Error al registrar la sucursal';
+                $_SESSION['mensaje'] = t('error_registering_branch');
                 $_SESSION['tipo_mensaje'] = 'error';
         }
 
@@ -55,7 +55,7 @@ function sucursal_editar() {
         $required = ['id_sucursal', 'codigo', 'nombre_sucursal', 'direccion', 'telefono'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                $_SESSION['mensaje'] = "Error: El campo $field es requerido";
+                $_SESSION['mensaje'] = sprintf(t('error_field_required_sprintf'), $field);
                 $_SESSION['tipo_mensaje'] = 'error';
                 header('Location: index.php?c=sucursal');
                 exit();
@@ -73,13 +73,13 @@ function sucursal_editar() {
         $resultado = $sucursalModel->actualizar($data);
 
         if ($resultado === true) {
-            $_SESSION['mensaje'] = 'Sucursal actualizada exitosamente';
+            $_SESSION['mensaje'] = t('branch_updated_successfully');
             $_SESSION['tipo_mensaje'] = 'success';
         } elseif ($resultado === 'codigo_existente') {
-            $_SESSION['mensaje'] = 'El código ya pertenece a otra sucursal';
+            $_SESSION['mensaje'] = t('error_code_belongs_other_branch');
             $_SESSION['tipo_mensaje'] = 'error';
         } else {
-            $_SESSION['mensaje'] = 'Error al actualizar la sucursal';
+            $_SESSION['mensaje'] = t('error_updating_branch');
             $_SESSION['tipo_mensaje'] = 'error';
         }
 
@@ -98,15 +98,15 @@ function sucursal_eliminar() {
         $eliminado = $sucursalModel->eliminar($id);
 
         if ($eliminado) {
-            $_SESSION['mensaje'] = "Sucursal eliminada correctamente.";
+            $_SESSION['mensaje'] = t('branch_deleted_successfully');
             $_SESSION['tipo_mensaje'] = "success";
         } else {
-            $_SESSION['mensaje'] = "Error al eliminar la sucursal.";
-            $_SESSION['tipo_mensaje'] = "danger";
+            $_SESSION['mensaje'] = t('error_deleting_branch');
+            $_SESSION['tipo_mensaje'] = "error"; // Changed danger to error for consistency with other error messages
         }
     } else {
-        $_SESSION['mensaje'] = "ID de sucursal no proporcionado.";
-        $_SESSION['tipo_mensaje'] = "danger";
+        $_SESSION['mensaje'] = t('error_branch_id_not_provided');
+        $_SESSION['tipo_mensaje'] = "error"; // Changed danger to error
     }
 
     header("Location: index.php?c=sucursal");

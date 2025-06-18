@@ -146,6 +146,23 @@ class Usuario extends Conexion implements IUsuarioModel {
         return $this->nombres . ' ' . $this->apellidos;
     }
 
+    public function updatePasswordByUsername(string $username, string $newPassword): bool {
+        try {
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            $stmt = $this->db->prepare("UPDATE usuarios SET password = ? WHERE username = ?");
+            $result = $stmt->execute([$hashedPassword, $username]);
+
+            // Check if any row was affected
+            if ($result && $stmt->rowCount() > 0) {
+                return true;
+            }
+            return false; // User not found or password was the same
+        } catch (PDOException $e) {
+            error_log("Error al actualizar contraseña: " . $e->getMessage());
+            return false;
+        }
+    }
+
     // Getters
     public function getDocumento()      { return $this->documento; }
     public function getTelefono()       { return $this->telefono; }
