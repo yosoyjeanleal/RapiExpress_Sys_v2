@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-06-2025 a las 14:35:53
+-- Tiempo de generación: 11-06-2025 a las 21:32:29
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -44,7 +44,7 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombre`, `apellido`, `email`, `telefono`, `direccion`, `fecha_registro`, `estado`) VALUES
-(13, '00000007', 'loco', 'juans', 'loco@gmail.com', '0234342', 'tuko', '2025-05-31 01:47:46', 'inactivo'),
+(13, '00000007', 'loco', 'juans', 'loco@gmail.com', '0234342', 'tuko', '2025-05-31 01:47:46', 'activo'),
 (14, '1181039599', 'Jean Carlos', 'Leal Guedez', 'jeancleal030220.04@gmail.com', '04268092177', 'Carrera 18\r\nSanta Eduvigis', '2025-06-01 14:14:13', 'inactivo');
 
 -- --------------------------------------------------------
@@ -67,7 +67,8 @@ CREATE TABLE `couriers` (
 
 INSERT INTO `couriers` (`id_courier`, `codigo`, `nombre`, `direccion`, `tipo`) VALUES
 (2, 'RE00002', 'Courier Express 24H', 'Calle Real, Local 4, Cabudare', 'Asociado'),
-(4, 'RE00004', 'FastCourier Lara', 'Av. Libertador, Torre A', 'Propio');
+(4, 'RE00004', 'FastCourier Lara', 'Av. Libertador, Torre A', 'Asociado'),
+(7, '99', 'klk', 'm,', 'Asociado');
 
 -- --------------------------------------------------------
 
@@ -98,6 +99,28 @@ CREATE TABLE `paquetes` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `sucursales`
+--
+
+CREATE TABLE `sucursales` (
+  `id_sucursal` int(11) NOT NULL,
+  `codigo` varchar(50) NOT NULL,
+  `nombre_sucursal` varchar(100) NOT NULL,
+  `direccion` varchar(255) NOT NULL,
+  `telefono` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `sucursales`
+--
+
+INSERT INTO `sucursales` (`id_sucursal`, `codigo`, `nombre_sucursal`, `direccion`, `telefono`) VALUES
+(3, '22', '34fg', 'sfsdf', '435345'),
+(4, '3001w', '', '', '');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `tiendas`
 --
 
@@ -121,9 +144,9 @@ INSERT INTO `tiendas` (`id_tienda`, `tracking`, `nombre_tienda`, `fecha_registro
 (10, 'TRK-0038', '23', '2025-05-19 16:43:44'),
 (11, 'SSSSS', 'ssss', '2025-05-19 17:40:22'),
 (12, 'P`P`L', '000000000', '2025-05-19 21:03:39'),
-(13, 'klkllññ', 'Electro Hogarjkkj', '2025-05-30 07:33:31'),
 (14, 'ñlk,ñ', 'Tienda Centralioo', '2025-05-30 07:57:52'),
-(15, 'ssasjk', 'Tienda Centri6', '2025-05-31 01:04:47');
+(15, 'ssasjk', 'Tienda Centri6', '2025-05-31 01:04:47'),
+(18, '545', '3233', '2025-06-07 20:51:39');
 
 -- --------------------------------------------------------
 
@@ -150,8 +173,10 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `documento`, `username`, `nombres`, `apellidos`, `telefono`, `email`, `sucursal`, `password`, `fecha_registro`, `cargo`) VALUES
-(20, '31152335', 'yankocompany', 'Jean Carlos', 'Leal Guedez', '+584268092177', 'jeancleal03022004@gmail.com', 'sucursal_ven', '$2y$10$ppYEjDUQzf.eDCSV.8hyFuiKFk9xP4SbdsI3xIjQ7sz/k4YKMSuIq', '2025-06-01 15:20:49', 'encargado_bodega'),
-(23, '8989', 'yankocompkany', 'Jean Carlos', 'Leal Guedez', '04268092177', 'jeanclkkkeal03022004@gmail.com', 'sucursal_ven', '$2y$10$0hlU6wRKVZzx1QHIfHM80.Zse8UqpRSKughC5ZjbNec3K9HZfCAjq', '2025-06-05 05:08:37', 'encargado_bodega');
+(20, '31152335', 'yankocompany', 'Jean Carlos', 'Leal Guedez', '+584268092177', 'jeancleal03022004@gmail.com', 'sucursal_ven', '$2y$10$rPFgRjzy2pJdII6GYZ1AyueQg3RZTXG3enJC6sgQp41tsvfoZDEt2', '2025-06-01 15:20:49', 'encargado_bodega'),
+(23, '8989', 'yankocompk', 'Jean Carlos', 'Leal Guedez', '04268092177', 'jeanclkkkeal03022004@gmail.com', 'sucursal_ven', '$2y$10$0hlU6wRKVZzx1QHIfHM80.Zse8UqpRSKughC5ZjbNec3K9HZfCAjq', '2025-06-05 05:08:37', 'encargado_bodega'),
+(26, '3115233566', 'yankocompanyM', 'Jean Carlos', 'Leal Guedez', '+584268092177', 'jeaLLncleal03022004@gmail.com', 'sucursal_ven', '$2y$10$oZ9tnkiboswLntEwfLhfaOZauXvlrUL.qxFshj/f9hf4D9eFYwEFu', '2025-06-08 15:57:14', 'encargado_bodega'),
+(27, '311523356', 'yankocompany1', 'Jean Carlos', 'Leal Guedez', '04268092177', 'jeancleal03022mm004@gmail.com', 'sucursal_ven', '$2y$10$VRE9Rt9zLa0hSH57kXftu.VRHkKVPWGbM6CsqQcJXpGc00rILsSb2', '2025-06-09 05:50:05', 'jefe_logística');
 
 --
 -- Índices para tablas volcadas
@@ -182,6 +207,13 @@ ALTER TABLE `paquetes`
   ADD KEY `id_cliente` (`id_cliente`);
 
 --
+-- Indices de la tabla `sucursales`
+--
+ALTER TABLE `sucursales`
+  ADD PRIMARY KEY (`id_sucursal`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
+
+--
 -- Indices de la tabla `tiendas`
 --
 ALTER TABLE `tiendas`
@@ -208,7 +240,7 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT de la tabla `couriers`
 --
 ALTER TABLE `couriers`
-  MODIFY `id_courier` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_courier` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `paquetes`
@@ -217,16 +249,22 @@ ALTER TABLE `paquetes`
   MODIFY `id_paquete` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `sucursales`
+--
+ALTER TABLE `sucursales`
+  MODIFY `id_sucursal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT de la tabla `tiendas`
 --
 ALTER TABLE `tiendas`
-  MODIFY `id_tienda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id_tienda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Restricciones para tablas volcadas
