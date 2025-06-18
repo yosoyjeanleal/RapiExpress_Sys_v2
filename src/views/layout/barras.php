@@ -22,6 +22,23 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <?php
+    // Ensure i18n functions are loaded. This might be redundant if index.php always loads it first,
+    // but it's a safeguard for direct includes or other scenarios.
+    // The path needs to be relative to this file (barras.php)
+    require_once __DIR__ . '/../../../config/i18n.php';
+    ?>
+    <script>
+        window.i18n_strings = <?= json_encode(get_js_translations()); ?>;
+        function jt(key, defaultValue = '') {
+            if (window.i18n_strings && window.i18n_strings.hasOwnProperty(key) && typeof window.i18n_strings[key] === 'string' && window.i18n_strings[key] !== '') {
+                return window.i18n_strings[key];
+            }
+            // Try to replace underscores with spaces and capitalize for a basic default
+            const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+            return defaultValue || formattedKey; // Return formatted key if default not provided
+        }
+    </script>
 </head>
 <body>
     <div class="header">
@@ -215,6 +232,12 @@
     
 
 
+    <div aria-live="polite" aria-atomic="true" style="position: relative;">
+        <div id="toastContainer" style="position: fixed; top: 80px; right: 20px; z-index: 1055; width: 350px;">
+            <!-- Toasts will be appended here by JavaScript -->
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script src="assets/js/password-validation.js"></script>
     <script src="assets/js/password_view.js"></script>
@@ -234,6 +257,32 @@
     <script src="assets/js/pdfmake.min.js"></script>
     <script src="assets/js/vfs_fonts.js"></script>		
     <script src="vendor/twbs/bootstrap/js/datatable-setting.js"></script>
-    
+
+    <?php
+    if (isset($_SESSION['toast_message']) && !empty($_SESSION['toast_message'])) {
+        $toast_message = $_SESSION['toast_message'];
+        $toast_type = $_SESSION['toast_type'] ?? 'info'; // Default to 'info' if type not set
+
+        // Unset them so they don't reappear
+        unset($_SESSION['toast_message']);
+        unset($_SESSION['toast_type']);
+
+        // Escape message for safe JS string, especially for multi-line or special chars
+        $escaped_message = json_encode($toast_message);
+
+        echo "<script>
+                // Ensure this runs after showToast is defined and DOM is somewhat ready
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof showToast === 'function') {
+                        showToast({$escaped_message}, '" . addslashes($toast_type) . "');
+                    } else {
+                        // Fallback or log error if showToast isn't defined yet
+                        console.warn('showToast function not ready for message: {$escaped_message}');
+                        // Could use a simple alert as a fallback: alert({$escaped_message});
+                    }
+                });
+              </script>";
+    }
+    ?>
 </body>
 </html>

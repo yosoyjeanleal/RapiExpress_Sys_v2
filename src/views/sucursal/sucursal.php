@@ -33,15 +33,12 @@ include 'src/views/layout/barras.php';
             <div class="card-box mb-30">
                 <div class="pd-20">
                     <h4 class="text-blue h4"><?= t('branches_list_title') ?></h4>
-                    <?php if (isset($_SESSION['mensaje']) && isset($_SESSION['tipo_mensaje'])): ?>
-                    <div class="alert alert-<?php echo $_SESSION['tipo_mensaje'] === 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
-                        <?= htmlspecialchars($_SESSION['mensaje']); ?>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="<?= t('button_close') ?>">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <?php unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); ?>
-                    <?php endif; ?>
+                    <?php
+                    // The old alert display is removed as toasts will be handled by barras.php
+                    // if (isset($_SESSION['toast_message']) && isset($_SESSION['toast_type'])):
+                    // No direct display here, barras.php handles it via JavaScript
+                    // endif;
+                    ?>
                     <div class="pull-right">
                         <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#sucursalModal">
                             <i class="fa fa-building"></i> <?= t('add_branch_button') ?>

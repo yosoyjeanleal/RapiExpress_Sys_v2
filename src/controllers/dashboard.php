@@ -10,7 +10,7 @@ function dashboard_index() {
  
 
     if (!isset($_SESSION['usuario'])) {
-        header('Location: /index.php?c=auth&a=login');
+        header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
         exit();
     }
 
@@ -34,7 +34,7 @@ $totalUsuarios = count($usuarios);
 
     } catch (\Throwable $e) {
         error_log("Error en Dashboard: " . $e->getMessage());
-        header('Location: /index.php?c=auth&a=login');
+        header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
         exit();
     }
 }

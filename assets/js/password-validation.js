@@ -15,19 +15,19 @@ document.addEventListener('DOMContentLoaded', function () {
         validationContainer.innerHTML = `
             <div class="password-validation-title">
                 <i class="icon-copy dw dw-shield"></i>
-                Requisitos de contraseña
+                ${jt('js_password_requirements_title', 'Password Requirements')}
             </div>
             <ul class="password-validation-list">
-                <li id="${passwordInput.name}-length" data-min="8">8+ caracteres</li>
-                <li id="${passwordInput.name}-uppercase">1 mayúscula</li>
-                <li id="${passwordInput.name}-lowercase">1 minúscula</li>
-                <li id="${passwordInput.name}-number">1 número</li>
-                <li id="${passwordInput.name}-special">1 especial (!@#$%^&*)</li>
+                <li id="${passwordInput.name}-length" data-min="8">${jt('js_req_length', '8+ characters')}</li>
+                <li id="${passwordInput.name}-uppercase">${jt('js_req_uppercase', '1 uppercase')}</li>
+                <li id="${passwordInput.name}-lowercase">${jt('js_req_lowercase', '1 lowercase')}</li>
+                <li id="${passwordInput.name}-number">${jt('js_req_number', '1 number')}</li>
+                <li id="${passwordInput.name}-special">${jt('js_req_special', '1 special char (!@#$%^&*)')}</li>
             </ul>
             <div class="password-strength-meter">
                 <div class="password-strength-meter-fill" id="${passwordInput.name}-strength-bar"></div>
             </div>
-            <div class="password-strength-text" id="${passwordInput.name}-strength-text">Seguridad: muy débil</div>
+            <div class="password-strength-text" id="${passwordInput.name}-strength-text">${jt('js_strength_label_prefix', 'Strength: ')}${jt('js_strength_very_weak', 'Very Weak')}</div>
         `;
 
         passwordContainer.parentNode.insertBefore(validationContainer, passwordContainer.nextSibling);
@@ -86,17 +86,17 @@ document.addEventListener('DOMContentLoaded', function () {
             let strengthColor = '';
 
             if (strength < 40) {
-                strengthLevel = 'Muy débil';
+                strengthLevel = jt('js_strength_very_weak', 'Very Weak');
                 strengthColor = '#e74c3c';
                 passwordInput.classList.remove('password-field-medium', 'password-field-strong');
                 passwordInput.classList.add('password-field-weak');
             } else if (strength < 75) {
-                strengthLevel = 'Moderada';
+                strengthLevel = jt('js_strength_moderate', 'Moderate');
                 strengthColor = '#f39c12';
                 passwordInput.classList.remove('password-field-weak', 'password-field-strong');
                 passwordInput.classList.add('password-field-medium');
             } else {
-                strengthLevel = 'Fuerte';
+                strengthLevel = jt('js_strength_strong', 'Strong');
                 strengthColor = '#27ae60';
                 passwordInput.classList.remove('password-field-weak', 'password-field-medium');
                 passwordInput.classList.add('password-field-strong');
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             strengthBar.style.width = strength + '%';
             strengthBar.style.backgroundColor = strengthColor;
-            strengthText.textContent = `Seguridad: ${strengthLevel}`;
+            strengthText.textContent = `${jt('js_strength_label_prefix', 'Strength: ')}${strengthLevel}`;
             strengthText.style.color = strengthColor;
         }
     });
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!allValid) {
                 e.preventDefault();
-                alert('Por favor, asegúrate de que todas las contraseñas cumplan con los requisitos.');
+                alert(jt('js_alert_password_requirements', 'Please ensure all passwords meet the requirements.'));
             }
         });
     });

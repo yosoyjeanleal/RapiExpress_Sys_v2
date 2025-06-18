@@ -5,7 +5,7 @@ use RapiExpress\Interface\ISucursalModel;
 
 function sucursal_index() {
     if (!isset($_SESSION['usuario'])) {
-        header('Location: index.php');
+        header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
         exit();
     }
 
@@ -30,19 +30,19 @@ function sucursal_registrar() {
 
         switch ($resultado) {
             case 'registro_exitoso':
-                $_SESSION['mensaje'] = t('branch_registered_successfully');
-                $_SESSION['tipo_mensaje'] = 'success';
+                $_SESSION['toast_message'] = t('branch_registered_successfully');
+                $_SESSION['toast_type'] = 'success';
                 break;
             case 'codigo_existente':
-                $_SESSION['mensaje'] = t('error_code_exists');
-                $_SESSION['tipo_mensaje'] = 'error';
+                $_SESSION['toast_message'] = t('error_code_exists');
+                $_SESSION['toast_type'] = 'error';
                 break;
             default:
-                $_SESSION['mensaje'] = t('error_registering_branch');
-                $_SESSION['tipo_mensaje'] = 'error';
+                $_SESSION['toast_message'] = t('error_registering_branch');
+                $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=sucursal');
+        header('Location: ' . APP_URL . 'index.php?c=sucursal');
         exit();
     }
 }
@@ -55,9 +55,9 @@ function sucursal_editar() {
         $required = ['id_sucursal', 'codigo', 'nombre_sucursal', 'direccion', 'telefono'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                $_SESSION['mensaje'] = sprintf(t('error_field_required_sprintf'), $field);
-                $_SESSION['tipo_mensaje'] = 'error';
-                header('Location: index.php?c=sucursal');
+                $_SESSION['toast_message'] = sprintf(t('error_field_required_sprintf'), $field);
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . APP_URL . 'index.php?c=sucursal');
                 exit();
             }
         }
@@ -73,17 +73,17 @@ function sucursal_editar() {
         $resultado = $sucursalModel->actualizar($data);
 
         if ($resultado === true) {
-            $_SESSION['mensaje'] = t('branch_updated_successfully');
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('branch_updated_successfully');
+            $_SESSION['toast_type'] = 'success';
         } elseif ($resultado === 'codigo_existente') {
-            $_SESSION['mensaje'] = t('error_code_belongs_other_branch');
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_code_belongs_other_branch');
+            $_SESSION['toast_type'] = 'error';
         } else {
-            $_SESSION['mensaje'] = t('error_updating_branch');
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_updating_branch');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=sucursal');
+        header('Location: ' . APP_URL . 'index.php?c=sucursal');
         exit();
     }
 }
@@ -98,18 +98,18 @@ function sucursal_eliminar() {
         $eliminado = $sucursalModel->eliminar($id);
 
         if ($eliminado) {
-            $_SESSION['mensaje'] = t('branch_deleted_successfully');
-            $_SESSION['tipo_mensaje'] = "success";
+            $_SESSION['toast_message'] = t('branch_deleted_successfully');
+            $_SESSION['toast_type'] = "success";
         } else {
-            $_SESSION['mensaje'] = t('error_deleting_branch');
-            $_SESSION['tipo_mensaje'] = "error"; // Changed danger to error for consistency with other error messages
+            $_SESSION['toast_message'] = t('error_deleting_branch');
+            $_SESSION['toast_type'] = "error";
         }
     } else {
-        $_SESSION['mensaje'] = t('error_branch_id_not_provided');
-        $_SESSION['tipo_mensaje'] = "error"; // Changed danger to error
+        $_SESSION['toast_message'] = t('error_branch_id_not_provided');
+        $_SESSION['toast_type'] = "error";
     }
 
-    header("Location: index.php?c=sucursal");
+    header("Location: " . APP_URL . "index.php?c=sucursal");
     exit();
 }
 

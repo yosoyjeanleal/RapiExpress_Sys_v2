@@ -10,7 +10,7 @@ require_once __DIR__ . '/../models/Courier.php';
 function courier_index() {
     $courierModel = new \RapiExpress\Models\Courier();
     if (!isset($_SESSION['usuario'])) {
-        header('Location: index.php');
+        header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
         exit();
     }
     $couriers = $courierModel->obtenerTodos();
@@ -31,17 +31,17 @@ function courier_registrar() {
         $resultado = $courierModel->registrar($data);
 
         if ($resultado === 'registro_exitoso') {
-            $_SESSION['mensaje'] = 'Courier registrado exitosamente';
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('courier_registered_successfully');
+            $_SESSION['toast_type'] = 'success';
         } elseif ($resultado === 'codigo_existente') {
-            $_SESSION['mensaje'] = 'Error: El código ya está registrado';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_code_exists'); // Reusing generic code exists error
+            $_SESSION['toast_type'] = 'error';
         } else {
-            $_SESSION['mensaje'] = 'Error inesperado al registrar el courier';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_unexpected_courier_registration');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=courier');
+        header('Location: ' . APP_URL . 'index.php?c=courier');
         exit();
     }
     
@@ -55,9 +55,9 @@ function courier_editar() {
         $required = ['id_courier', 'codigo', 'nombre', 'direccion', 'tipo'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                $_SESSION['mensaje'] = "Error: El campo $field es requerido";
-                $_SESSION['tipo_mensaje'] = 'error';
-                header('Location: index.php?c=courier');
+                $_SESSION['toast_message'] = sprintf(t('error_field_required_sprintf'), $field);
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . APP_URL . 'index.php?c=courier');
                 exit();
             }
         }
@@ -73,14 +73,16 @@ function courier_editar() {
         $resultado = $courierModel->actualizar($data);
 
         if ($resultado === true) {
-            $_SESSION['mensaje'] = 'Courier actualizado exitosamente';
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('courier_updated_successfully');
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['mensaje'] = 'Error al actualizar el courier';
-            $_SESSION['tipo_mensaje'] = 'error';
+            // Consider if 'codigo_existente' can be returned by update, if so, handle it.
+            // For now, a generic update error.
+            $_SESSION['toast_message'] = t('error_updating_courier');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=courier');
+        header('Location: ' . APP_URL . 'index.php?c=courier');
         exit();
     }
 }
@@ -94,14 +96,14 @@ function courier_eliminar() {
         $resultado = $courierModel->eliminar($id);
 
         if ($resultado) {
-            $_SESSION['mensaje'] = 'Courier eliminado exitosamente';
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('courier_deleted_successfully');
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['mensaje'] = 'Error al eliminar el courier';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_deleting_courier');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=courier');
+        header('Location: ' . APP_URL . 'index.php?c=courier');
         exit();
     }
 }

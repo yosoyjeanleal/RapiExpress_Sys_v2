@@ -6,7 +6,7 @@
 function paquete_index() {
     $paqueteModel = new \RapiExpress\Models\Paquete();
     if (!isset($_SESSION['usuario'])) {
-        header('Location: index.php');
+        header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
         exit();
     }
     $paquetes = $paqueteModel->obtenerTodos();
@@ -38,14 +38,14 @@ function paquete_registrar() {
         $resultado = $paqueteModel->registrar($data);
 
         if ($resultado === true) {
-            $_SESSION['mensaje'] = 'Paquete registrado exitosamente';
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('package_registered_successfully');
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['mensaje'] = 'Error al registrar el paquete';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_registering_package');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=paquete');
+        header('Location: ' . APP_URL . 'index.php?c=paquete');
         exit();
     }
 }
@@ -76,14 +76,14 @@ function paquete_editar() {
         $resultado = $paqueteModel->actualizar($data);
 
         if ($resultado === true) {
-            $_SESSION['mensaje'] = 'Paquete actualizado exitosamente';
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('package_updated_successfully');
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['mensaje'] = 'Error al actualizar el paquete';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_updating_package');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=paquete');
+        header('Location: ' . APP_URL . 'index.php?c=paquete');
         exit();
     }
 }
@@ -97,14 +97,14 @@ function paquete_eliminar() {
         $resultado = $paqueteModel->eliminar($id);
 
         if ($resultado) {
-            $_SESSION['mensaje'] = 'Paquete eliminado exitosamente';
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('package_deleted_successfully');
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['mensaje'] = 'Error al eliminar el paquete';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_deleting_package');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=paquete');
+        header('Location: ' . APP_URL . 'index.php?c=paquete');
         exit();
     }
 }

@@ -10,7 +10,7 @@ use RapiExpress\Interface\ITiendaModel;
 function tienda_index() {
 
     if (!isset($_SESSION['usuario'])) {
-        header('Location: index.php');
+        header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
         exit();
     }
 
@@ -33,19 +33,19 @@ function tienda_registrar() {
 
         switch ($resultado) {
             case 'registro_exitoso':
-                $_SESSION['mensaje'] = 'Tienda registrada exitosamente';
-                $_SESSION['tipo_mensaje'] = 'success';
+                $_SESSION['toast_message'] = t('store_registered_successfully');
+                $_SESSION['toast_type'] = 'success';
                 break;
             case 'tracking_existente':
-                $_SESSION['mensaje'] = 'El código de tracking ya está registrado';
-                $_SESSION['tipo_mensaje'] = 'error';
+                $_SESSION['toast_message'] = t('error_tracking_code_exists');
+                $_SESSION['toast_type'] = 'error';
                 break;
             default:
-                $_SESSION['mensaje'] = 'Error al registrar la tienda';
-                $_SESSION['tipo_mensaje'] = 'error';
+                $_SESSION['toast_message'] = t('error_registering_store');
+                $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=tienda');
+        header('Location: ' . APP_URL . 'index.php?c=tienda');
         exit();
     }
 }
@@ -58,9 +58,9 @@ function tienda_editar() {
         $required = ['id_tienda', 'tracking', 'nombre_tienda'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                $_SESSION['mensaje'] = "Error: El campo $field es requerido";
-                $_SESSION['tipo_mensaje'] = 'error';
-                header('Location: index.php?c=tienda');
+                $_SESSION['toast_message'] = sprintf(t('error_field_required_sprintf'), $field);
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . APP_URL . 'index.php?c=tienda');
                 exit();
             }
         }
@@ -74,17 +74,17 @@ function tienda_editar() {
         $resultado = $tiendaModel->actualizar($data);
 
         if ($resultado === true) {
-            $_SESSION['mensaje'] = 'Tienda actualizada exitosamente';
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('store_updated_successfully');
+            $_SESSION['toast_type'] = 'success';
         } elseif ($resultado === 'tracking_existente') {
-            $_SESSION['mensaje'] = 'El tracking ya pertenece a otra tienda';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_tracking_code_belongs_other_store');
+            $_SESSION['toast_type'] = 'error';
         } else {
-            $_SESSION['mensaje'] = 'Error al actualizar la tienda';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_updating_store');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=tienda');
+        header('Location: ' . APP_URL . 'index.php?c=tienda');
         exit();
     }
 }
@@ -99,18 +99,18 @@ function tienda_eliminar() {
         $eliminado = $tiendaModel->eliminar($id);
 
         if ($eliminado) {
-            $_SESSION['mensaje'] = "Tienda eliminada correctamente.";
-            $_SESSION['tipo_mensaje'] = "success";
+            $_SESSION['toast_message'] = t('store_deleted_successfully');
+            $_SESSION['toast_type'] = "success";
         } else {
-            $_SESSION['mensaje'] = "Error al eliminar la tienda.";
-            $_SESSION['tipo_mensaje'] = "danger";
+            $_SESSION['toast_message'] = t('error_deleting_store');
+            $_SESSION['toast_type'] = "error";
         }
     } else {
-        $_SESSION['mensaje'] = "ID de tienda no proporcionado.";
-        $_SESSION['tipo_mensaje'] = "danger";
+        $_SESSION['toast_message'] = t('error_store_id_not_provided');
+        $_SESSION['toast_type'] = "error";
     }
 
-    header("Location: index.php?c=tienda");
+    header("Location: " . APP_URL . "index.php?c=tienda");
     exit();
 }
 

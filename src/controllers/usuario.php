@@ -7,7 +7,7 @@ use RapiExpress\Config\Conexion;
 function usuario_index() {
    
     if (!isset($_SESSION['usuario'])) {
-        header('Location: index.php');
+        header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
         exit();
     }
 
@@ -32,9 +32,9 @@ function usuario_registrar() {
         ];
 
         if (empty($data['documento']) || empty($data['username']) || empty($data['email']) || empty($data['password'])) {
-            $_SESSION['mensaje'] = 'Todos los campos son obligatorios.';
-            $_SESSION['tipo_mensaje'] = 'error';
-            header('Location: index.php?c=usuario');
+            $_SESSION['toast_message'] = t('error_all_fields_mandatory');
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . APP_URL . 'index.php?c=usuario');
             exit();
         }
 
@@ -43,28 +43,28 @@ function usuario_registrar() {
 
         switch ($resultado) {
             case 'registro_exitoso':
-                $_SESSION['mensaje'] = 'Usuario registrado exitosamente.';
-                $_SESSION['tipo_mensaje'] = 'success';
+                $_SESSION['toast_message'] = t('user_registered_successfully');
+                $_SESSION['toast_type'] = 'success';
                 break;
             case 'documento_existente':
-                $_SESSION['mensaje'] = 'El documento ya está registrado.';
-                $_SESSION['tipo_mensaje'] = 'error';
+                $_SESSION['toast_message'] = t('error_document_already_exists'); // Reusing generic key
+                $_SESSION['toast_type'] = 'error';
                 break;
             case 'email_existente':
-                $_SESSION['mensaje'] = 'El correo electrónico ya está registrado.';
-                $_SESSION['tipo_mensaje'] = 'error';
+                $_SESSION['toast_message'] = t('error_email_already_registered'); // Reusing generic key
+                $_SESSION['toast_type'] = 'error';
                 break;
             case 'username_existente':
-                $_SESSION['mensaje'] = 'El nombre de usuario ya está registrado.';
-                $_SESSION['tipo_mensaje'] = 'error';
+                $_SESSION['toast_message'] = t('error_username_already_registered'); // Reusing generic key
+                $_SESSION['toast_type'] = 'error';
                 break;
             default:
-                $_SESSION['mensaje'] = 'Error inesperado al registrar el usuario.';
-                $_SESSION['tipo_mensaje'] = 'error';
+                $_SESSION['toast_message'] = t('error_unexpected_user_registration');
+                $_SESSION['toast_type'] = 'error';
                 break;
         }
 
-        header('Location: index.php?c=usuario');
+        header('Location: ' . APP_URL . 'index.php?c=usuario');
         exit();
     }
 }
@@ -76,9 +76,9 @@ function usuario_editar() {
         $required = ['id', 'documento', 'username', 'nombres', 'apellidos', 'email', 'telefono', 'sucursal', 'cargo'];
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                $_SESSION['mensaje'] = "Error: El campo $field es requerido";
-                $_SESSION['tipo_mensaje'] = 'error';
-                header('Location: index.php?c=usuario');
+                $_SESSION['toast_message'] = sprintf(t('error_field_required_sprintf'), $field);
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . APP_URL . 'index.php?c=usuario');
                 exit();
             }
         }
@@ -96,9 +96,9 @@ function usuario_editar() {
         ];
 
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['mensaje'] = 'Formato de email inválido';
-            $_SESSION['tipo_mensaje'] = 'error';
-            header('Location: index.php?c=usuario');
+            $_SESSION['toast_message'] = t('error_invalid_email_format');
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . APP_URL . 'index.php?c=usuario');
             exit();
         }
 
@@ -106,17 +106,17 @@ function usuario_editar() {
         $resultado = $usuario->actualizar($data);
 
         if ($resultado === true) {
-            $_SESSION['mensaje'] = 'Usuario actualizado exitosamente';
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('user_updated_successfully');
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['mensaje'] = 'Error al actualizar el usuario';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_updating_user');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=usuario');
+        header('Location: ' . APP_URL . 'index.php?c=usuario');
         exit();
     } else {
-        header('Location: index.php?c=usuario');
+        header('Location: ' . APP_URL . 'index.php?c=usuario');
         exit();
     }
 }
@@ -133,9 +133,9 @@ function usuario_eliminar() {
 $usuarioAEliminar = $usuarioModel->obtenerPorId($id);
 
         if ($usuarioAEliminar && $usuarioAEliminar['username'] === $usuarioActual) {
-            $_SESSION['mensaje'] = 'No puedes eliminar tu propia cuenta mientras estás logueado.';
-            $_SESSION['tipo_mensaje'] = 'error';
-            header('Location: index.php?c=usuario');
+            $_SESSION['toast_message'] = t('error_cannot_delete_own_account');
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . APP_URL . 'index.php?c=usuario');
             exit();
         }
 
@@ -143,14 +143,14 @@ $usuarioAEliminar = $usuarioModel->obtenerPorId($id);
         $resultado = $usuario->eliminar($id);
 
         if ($resultado) {
-            $_SESSION['mensaje'] = 'Usuario eliminado exitosamente';
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('user_deleted_successfully');
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['mensaje'] = 'Error al eliminar el usuario';
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_deleting_user');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=usuario');
+        header('Location: ' . APP_URL . 'index.php?c=usuario');
         exit();
     }
 }

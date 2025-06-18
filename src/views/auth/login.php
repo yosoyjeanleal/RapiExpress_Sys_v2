@@ -37,12 +37,10 @@
                             <h2 class="text-center text-primary"><?= t('login_title') ?></h2>
                         </div>
                         <?php
-                        // Mostrar mensaje de registro exitoso si viene por GET
-                        if (isset($_GET['registro']) && $_GET['registro'] === 'exitoso') {
-                            echo '<div class="alert alert-success mt-3">' . t('registration_successful_notice') . '</div>';
-                        }
+                        // Mensaje de registro exitoso ahora se maneja por Toasts globales.
+                        // El bloque anterior if (isset($_GET['registro'])...) ha sido eliminado.
 
-                        // Mostrar mensajes de error/success del POST
+                        // Mostrar mensajes de error del POST (si no se redirige con toast)
                         if (isset($error) && !empty($error)) {
                             echo '<div class="alert alert-danger mt-3">' . htmlspecialchars($error) . '</div>';
                         }

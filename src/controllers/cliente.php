@@ -7,7 +7,7 @@ require_once __DIR__ . '/../models/Cliente.php';
 function cliente_index() {
     $clienteModel = new \RapiExpress\Models\Cliente();
     if (!isset($_SESSION['usuario'])) {
-        header('Location: index.php');
+        header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
         exit();
     }
     $clientes = $clienteModel->obtenerTodos();
@@ -29,29 +29,29 @@ function cliente_registrar() {
         ];
 
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['mensaje'] = t('error_invalid_email_format');
-            $_SESSION['tipo_mensaje'] = 'error';
-            header('Location: index.php?c=cliente');
+            $_SESSION['toast_message'] = t('error_invalid_email_format');
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . APP_URL . 'index.php?c=cliente');
             exit();
         }
 
         $resultado = $clienteModel->registrar($data);
 
         if ($resultado === 'registro_exitoso') {
-            $_SESSION['mensaje'] = t('client_registered_successfully');
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('client_registered_successfully');
+            $_SESSION['toast_type'] = 'success';
         } elseif ($resultado === 'cedula_existente') {
-            $_SESSION['mensaje'] = t('error_id_card_exists');
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_id_card_exists');
+            $_SESSION['toast_type'] = 'error';
         } elseif ($resultado === 'email_existente') {
-            $_SESSION['mensaje'] = t('error_email_already_exists'); // or use generic 'error_email_exists'
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_email_already_exists'); // or use generic 'error_email_exists'
+            $_SESSION['toast_type'] = 'error';
         } else {
-            $_SESSION['mensaje'] = t('error_unexpected_client_registration');
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_unexpected_client_registration');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=cliente');
+        header('Location: ' . APP_URL . 'index.php?c=cliente');
         exit();
     }
 }
@@ -65,9 +65,9 @@ function cliente_editar() {
             if (empty($_POST[$field])) {
                 // It's better to translate the field name if possible, or use a generic message.
                 // For now, using the raw field name as per the plan.
-                $_SESSION['mensaje'] = sprintf(t('error_field_required_sprintf'), $field);
-                $_SESSION['tipo_mensaje'] = 'error';
-                header('Location: index.php?c=cliente');
+                $_SESSION['toast_message'] = sprintf(t('error_field_required_sprintf'), $field);
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . APP_URL . 'index.php?c=cliente');
                 exit();
             }
         }
@@ -84,23 +84,23 @@ function cliente_editar() {
         ];
 
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['mensaje'] = t('error_invalid_email_format');
-            $_SESSION['tipo_mensaje'] = 'error';
-            header('Location: index.php?c=cliente');
+            $_SESSION['toast_message'] = t('error_invalid_email_format');
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . APP_URL . 'index.php?c=cliente');
             exit();
         }
 
         $resultado = $clienteModel->actualizar($data);
 
         if ($resultado === true) {
-            $_SESSION['mensaje'] = t('client_updated_successfully');
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('client_updated_successfully');
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['mensaje'] = t('error_updating_client');
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_updating_client');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=cliente');
+        header('Location: ' . APP_URL . 'index.php?c=cliente');
         exit();
     }
 }
@@ -114,14 +114,14 @@ function cliente_eliminar() {
         $resultado = $clienteModel->eliminar($id);
 
         if ($resultado) {
-            $_SESSION['mensaje'] = t('client_deleted_successfully');
-            $_SESSION['tipo_mensaje'] = 'success';
+            $_SESSION['toast_message'] = t('client_deleted_successfully');
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['mensaje'] = t('error_deleting_client');
-            $_SESSION['tipo_mensaje'] = 'error';
+            $_SESSION['toast_message'] = t('error_deleting_client');
+            $_SESSION['toast_type'] = 'error';
         }
 
-        header('Location: index.php?c=cliente');
+        header('Location: ' . APP_URL . 'index.php?c=cliente');
         exit();
     }
 }

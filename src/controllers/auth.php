@@ -55,7 +55,7 @@ function auth_login() {
             if ($usuario) {
                 $_SESSION['usuario'] = $usuario['username'];
                 $_SESSION['nombre_completo'] = $usuario['nombres'] . ' ' . $usuario['apellidos'];
-                header('Location: index.php?c=dashboard&a=index');
+                header('Location: ' . APP_URL . 'index.php?c=dashboard&a=index');
                 exit();
             } else {
                 $error = t('error_invalid_credentials');
@@ -121,8 +121,9 @@ function auth_register() {
 
             switch ($resultado) {
                 case 'registro_exitoso':
-                    $_SESSION['registro_exitoso'] = true;
-                    header('Location: index.php?c=auth&a=login&registro=exitoso');
+                    $_SESSION['toast_message'] = t('registration_successful_notice');
+                    $_SESSION['toast_type'] = 'success';
+                    header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
                     exit();
 
                 case 'documento_existente':
@@ -150,14 +151,15 @@ function auth_register() {
 }
 
 function auth_recoverPassword() {
+    // $error and $success local variables are no longer strictly needed here if all POST paths redirect.
+    // However, they are kept for the case where the view is re-rendered on CSRF error.
     $error = '';
-    $success = '';
+    // $success = ''; // Success always redirects with a toast
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Verificar token CSRF primero
         if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
-            $error = t('error_validation_csrf');
-            // Generar un nuevo token para el siguiente intento del formulario
+            $error = t('error_validation_csrf'); // This error will be shown on the re-rendered page
             $csrf_token = generate_csrf_token();
             include __DIR__ . '/../views/auth/recoverpassword.php';
             return;
@@ -171,18 +173,25 @@ function auth_recoverPassword() {
             $updateResult = $usuarioModel->updatePasswordByUsername($username, $newPassword);
 
             if ($updateResult) {
-                $success = t('success_password_updated');
+                $_SESSION['toast_message'] = t('success_password_updated');
+                $_SESSION['toast_type'] = 'success';
+                header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
+                exit();
             } else {
-                // El método updatePasswordByUsername podría mejorarse para distinguir "no encontrado" de "error DB"
-                // Por ahora, usamos una clave que sugiere verificar el usuario, o podría ser error_user_not_found si es más probable
-                $error = t('error_updating_password');
+                $_SESSION['toast_message'] = t('error_updating_password');
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . APP_URL . 'index.php?c=auth&a=recoverPassword');
+                exit();
             }
         } else {
-            $error = t('error_please_complete_all_fields');
+            $_SESSION['toast_message'] = t('error_please_complete_all_fields');
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . APP_URL . 'index.php?c=auth&a=recoverPassword');
+            exit();
         }
     }
 
-    // Generar token CSRF para mostrar en el formulario
+    // Generar token CSRF para mostrar en el formulario (GET request or CSRF error)
     $csrf_token = generate_csrf_token();
     include __DIR__ . '/../views/auth/recoverpassword.php';
 }
@@ -191,6 +200,6 @@ function auth_logout() {
     session_start();
     session_unset();
     session_destroy();
-    header('Location: index.php?c=auth&a=login');
+    header('Location: ' . APP_URL . 'index.php?c=auth&a=login');
     exit();
 }

@@ -8,7 +8,8 @@ define('DEFAULT_LANGUAGE', 'es');
 define('SUPPORTED_LANGUAGES', ['en', 'es']);
 define('LANG_PATH', __DIR__ . '/../locales');
 
-$translations = []; // Cache for loaded translation files
+// Note: The global $translations cache is no longer used by t() directly.
+// t() now uses a static cache. get_js_translations() will load its own.
 
 /**
  * Sets the current language for the session.
@@ -42,30 +43,31 @@ function getCurrentLanguage(): string {
  * @return string The translated string, or the key itself (or $default_value) if not found.
  */
 function t(string $key, string $default_value = null): string {
-    global $translations;
-    $lang = getCurrentLanguage();
-    $file_path = LANG_PATH . "/{$lang}/common.php";
+    static $loaded_translations = []; // Static cache for t()
+    $current_lang = getCurrentLanguage();
 
-    // Load translations if not already cached for this language
-    if (!isset($translations[$lang])) {
+    if (!isset($loaded_translations[$current_lang])) {
+        $file_path = LANG_PATH . "/{$current_lang}/common.php";
         if (file_exists($file_path)) {
-            $translations[$lang] = require $file_path;
+            $loaded_translations[$current_lang] = require $file_path;
         } else {
             // Fallback to default language if current language file is missing
-            if ($lang !== DEFAULT_LANGUAGE) {
-                $fallback_path = LANG_PATH . "/" . DEFAULT_LANGUAGE . "/common.php";
-                if (file_exists($fallback_path)) {
-                    $translations[$lang] = require $fallback_path; // Store under current lang key to avoid reload
+            if ($current_lang !== DEFAULT_LANGUAGE) {
+                $default_file_path = LANG_PATH . "/" . DEFAULT_LANGUAGE . "/common.php";
+                if (file_exists($default_file_path)) {
+                    // Load default translations but store them under the current language key
+                    // to avoid attempting to reload the current language file on every t() call if it's missing.
+                    $loaded_translations[$current_lang] = require $default_file_path;
                 } else {
-                    $translations[$lang] = []; // No translation file found
+                    $loaded_translations[$current_lang] = []; // Default language file also missing
                 }
             } else {
-                 $translations[$lang] = []; // Default language file also missing
+                 $loaded_translations[$current_lang] = []; // Current language is default, and its file is missing
             }
         }
     }
 
-    return $translations[$lang][$key] ?? $default_value ?? $key;
+    return $loaded_translations[$current_lang][$key] ?? $default_value ?? $key;
 }
 
 /**
@@ -114,6 +116,41 @@ function generate_lang_url(string $lang_code): string {
     }
 
     return basename($_SERVER['PHP_SELF']) . '?' . http_build_query($current_params);
+}
+
+/**
+ * Retrieves all translations for the current or default language, intended for JavaScript.
+ * It ensures that all keys from the default language are present, overlayed by current language translations.
+ *
+ * @return array The array of translations.
+ */
+function get_js_translations(): array {
+    static $js_translations_cache = null; // Cache for this function
+
+    if ($js_translations_cache === null) {
+        $current_lang = getCurrentLanguage();
+        $translations_to_expose = [];
+        $default_translations = [];
+
+        $default_file_path = LANG_PATH . "/" . DEFAULT_LANGUAGE . "/common.php";
+        if (file_exists($default_file_path)) {
+            $default_translations = require $default_file_path;
+        }
+
+        $translations_to_expose = $default_translations; // Start with default translations
+
+        if ($current_lang !== DEFAULT_LANGUAGE) {
+            $current_lang_file_path = LANG_PATH . "/{$current_lang}/common.php";
+            if (file_exists($current_lang_file_path)) {
+                $current_lang_translations = require $current_lang_file_path;
+                // Override default translations with current language translations
+                $translations_to_expose = array_merge($default_translations, $current_lang_translations);
+            }
+            // If current lang file doesn't exist, $translations_to_expose remains as $default_translations
+        }
+        $js_translations_cache = $translations_to_expose;
+    }
+    return $js_translations_cache;
 }
 
 ?>
